@@ -46,9 +46,6 @@
   html{scroll-behavior:smooth;}
   body{background:var(--void); color:var(--text); font-family:var(--font-body); line-height:1.6; overflow-x:hidden;}
 
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
-  }
 
   a{color:inherit; text-decoration:none;}
   ul{list-style:none;}
@@ -5316,7 +5313,7 @@ three/build/three.module.js:
   if(typeof THREE === 'undefined') return;
   const canvas = document.getElementById('hero3d');
   if(!canvas || !window.WebGLRenderingContext) return;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = false; // animations toujours actives, indépendamment du réglage OS
 
   let renderer;
   try{
@@ -5434,7 +5431,7 @@ three/build/three.module.js:
 // ---- Storm Tweaks : nappe de plasma en fond de page (WebGL shader) ----
 (function initStormField(){
  try{
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = false; // animations toujours actives, indépendamment du réglage OS
   const canvas = document.getElementById('stormField');
   if(reduceMotion || !canvas || typeof THREE === 'undefined' || !window.WebGLRenderingContext) return;
   if(window.innerWidth < 560) return;
@@ -5519,7 +5516,7 @@ three/build/three.module.js:
 // ---- Storm Tweaks : illustration isométrique "sous le capot" ----
 (function initTune3D(){
  try{
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = false; // animations toujours actives, indépendamment du réglage OS
   const canvas = document.getElementById('tune3d');
   if(!canvas || typeof THREE === 'undefined' || !window.WebGLRenderingContext) return;
 
@@ -5623,7 +5620,7 @@ three/build/three.module.js:
 </script>
 <script>
 (function(){
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = false; // animations toujours actives, indépendamment du réglage OS
   const canHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
   function feature(name, fn){
     try{ fn(); }catch(err){ console.error('[storm:' + name + ']', err && err.stack || err); }
