@@ -5381,7 +5381,7 @@ three/build/three.module.js:
     mouseY = (e.clientY / window.innerHeight) - 0.5;
   }, { passive:true });
 
-  const clock = new THREE.Clock();
+  const clock = { t0:performance.now(), getElapsedTime(){ return (performance.now() - this.t0) / 1000; } };
   let rafId = null;
 
   function renderOnce(){ renderer.render(scene, camera); }
@@ -5497,7 +5497,7 @@ three/build/three.module.js:
   resize();
   window.addEventListener('resize', resize);
 
-  const clock = new THREE.Clock();
+  const clock = { t0:performance.now(), getElapsedTime(){ return (performance.now() - this.t0) / 1000; } };
   let rafId = null;
   function animate(){
     rafId = requestAnimationFrame(animate);
@@ -5578,7 +5578,7 @@ three/build/three.module.js:
     camera.updateProjectionMatrix();
   }
 
-  const clock = new THREE.Clock();
+  const clock = { t0:performance.now(), getElapsedTime(){ return (performance.now() - this.t0) / 1000; } };
   function animate(){
     rafId = requestAnimationFrame(animate);
     const t = clock.getElapsedTime();
