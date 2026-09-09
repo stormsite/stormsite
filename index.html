@@ -80,8 +80,19 @@
   }
   .loader.is-hidden{opacity:0; visibility:hidden; pointer-events:none;}
   @keyframes loader-autohide{ to{ opacity:0; visibility:hidden; pointer-events:none; } }
-  .loader-bolt{width:46px; height:46px; color:var(--gold); animation:loader-flicker 1s ease-in-out infinite;}
-  @keyframes loader-flicker{0%,100%{filter:drop-shadow(0 0 6px #ffc40099);} 50%{filter:drop-shadow(0 0 18px #ffc400cc);}}
+  .loader-portal{position:relative; width:118px; height:118px; display:grid; place-items:center;}
+  .loader-ring{
+    position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(from 0deg, transparent 0deg, var(--grad-3) 90deg, var(--grad-2) 200deg, var(--grad-1) 300deg, transparent 360deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    mask:radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    filter:drop-shadow(0 0 16px #8b2ff599);
+    animation:portal-spin 1.5s linear infinite;
+  }
+  .loader-ring.ring-2{inset:16px; animation-duration:2.2s; animation-direction:reverse; opacity:.65;}
+  @keyframes portal-spin{ to{ transform:rotate(360deg); } }
+  .loader-bolt{width:38px; height:38px; color:var(--gold); position:relative; z-index:1; animation:loader-flicker 1s ease-in-out infinite;}
+  @keyframes loader-flicker{0%,100%{filter:drop-shadow(0 0 6px #ffc40099); transform:scale(1);} 50%{filter:drop-shadow(0 0 20px #ffc400cc); transform:scale(1.08);}}
   .loader-label{font-family:var(--font-mono); font-size:0.75rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted-2);}
   .loader-bar{width:200px; height:2px; background:var(--line); border-radius:2px; overflow:hidden;}
   .loader-bar span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--grad-1), var(--grad-2), var(--grad-3)); animation:loader-progress 1.6s var(--ease-out) forwards;}
@@ -121,6 +132,8 @@
       var(--void);
     animation:storm-drift 20s ease-in-out infinite alternate;
   }
+  .storm-field{position:fixed; inset:0; z-index:-3; pointer-events:none; opacity:.32; mix-blend-mode:screen;}
+  @media (max-width:559px){ .storm-field{display:none;} }
   @keyframes storm-drift{
     from{ transform:scale(1) translate(0, 0); }
     to{ transform:scale(1.06) translate(-1.5%, 1.5%); }
@@ -217,8 +230,10 @@
   .hero{padding:96px 0 70px; position:relative; overflow:hidden; min-height:88vh; display:flex; align-items:center;}
   .hero3d-canvas{position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.9; mask-image:radial-gradient(ellipse 70% 80% at 62% 45%, black 55%, transparent 100%);}
   .hero-inner{position:relative; z-index:1; display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center; width:100%;}
-  .hero h1{font-family:var(--font-hero); font-size:clamp(2.3rem, 4.6vw, 3.5rem); margin:18px 0 20px; line-height:1.12; text-transform:uppercase;}
-  .hero h1 span{
+  .hero h1{font-family:var(--font-hero); font-size:clamp(2.6rem, 6vw, 4.6rem); margin:18px 0 20px; line-height:1.04; letter-spacing:-0.01em; text-transform:uppercase;}
+  .hero h1 .line-mask{display:block; overflow:hidden;}
+  .hero h1 .line-inner{display:block; will-change:transform;}
+  .hero h1 .grad{
     background:linear-gradient(100deg, var(--grad-1), var(--grad-2) 55%, var(--grad-3));
     -webkit-background-clip:text; background-clip:text; color:transparent;
     animation:text-glow 3.6s ease-in-out infinite;
@@ -333,12 +348,12 @@
   .tune-list li{display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); color:var(--muted); font-size:0.94rem;}
   .tune-list li:last-child{border-bottom:none;}
   .tune-list b{color:var(--text); font-weight:600;}
-  .tune-orb{position:relative; width:100%; aspect-ratio:1; max-width:260px; margin:0 auto; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center;}
-  .tune-orb::before,.tune-orb::after{content:''; position:absolute; inset:14%; border-radius:50%; border:1px dashed var(--line-glow); opacity:.4; animation:orb-spin 12s linear infinite;}
-  .tune-orb::after{inset:28%; animation-duration:9s; animation-direction:reverse; border-color:var(--grad-3);}
-  @keyframes orb-spin{ to{ transform:rotate(360deg); } }
-  .tune-orb-core{width:34%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--grad-3), var(--grad-1) 60%, transparent 100%); box-shadow:0 0 40px 6px #8b2ff566; animation:core-pulse 3s ease-in-out infinite;}
-  @keyframes core-pulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.08);}}
+  .tune-3d-wrap{position:relative; width:100%; aspect-ratio:1/0.92; max-width:300px; margin:0 auto;}
+  .tune-3d{width:100%; height:100%; display:block;}
+  .tune-3d-wrap::after{
+    content:''; position:absolute; inset:6% 10% -4%; z-index:-1; border-radius:50%;
+    background:radial-gradient(ellipse at center, #8b2ff53a, transparent 70%); filter:blur(6px);
+  }
 
   /* ---------- pastilles filtre ---------- */
   .filters{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:34px;}
@@ -461,7 +476,7 @@
     .hero{min-height:auto;}
     .features{grid-template-columns:repeat(2,1fr);}
     .tune-panel{grid-template-columns:1fr; padding:30px;}
-    .tune-orb{order:-1;}
+    .tune-3d-wrap{order:-1;}
     .products{grid-template-columns:1fr;}
     .footer-grid{grid-template-columns:1fr 1fr;}
   }
@@ -476,7 +491,11 @@
 <body>
 
 <div class="loader" id="loader">
-  <svg class="loader-bolt" viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-2 8 10-13h-6l1-7Z" fill="currentColor"/></svg>
+  <div class="loader-portal">
+    <div class="loader-ring" aria-hidden="true"></div>
+    <div class="loader-ring ring-2" aria-hidden="true"></div>
+    <svg class="loader-bolt" viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-2 8 10-13h-6l1-7Z" fill="currentColor"/></svg>
+  </div>
   <span class="loader-label">Chargement de la tempête…</span>
   <div class="loader-bar"><span></span></div>
 </div>
@@ -484,6 +503,7 @@
 <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 <div class="storm-bg" aria-hidden="true"></div>
+<canvas class="storm-field" id="stormField" aria-hidden="true"></canvas>
 <div class="grain" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
 
@@ -536,7 +556,7 @@
     <div class="wrap hero-inner">
       <div>
         <span class="eyebrow">Optimisation PC // Gaming</span>
-        <h1 id="heroTitle">Domptez la tempête.<br><span>Boostez vos FPS.</span></h1>
+        <h1 id="heroTitle"><span class="line-mask"><span class="line-inner">Domptez la tempête.</span></span><span class="line-mask"><span class="line-inner grad">Boostez vos FPS.</span></span></h1>
         <p>Storm Tweaks nettoie votre système, débloque les performances cachées de votre PC et réduit la latence pour un gameplay plus fluide, plus stable et plus précis.</p>
         <div class="hero-ctas">
           <a href="#tweaks" class="btn btn-primary">Découvrir les tweaks</a>
@@ -626,7 +646,7 @@
   <section id="detail">
     <div class="wrap">
       <div class="tune-panel reveal">
-        <div class="tune-orb" aria-hidden="true"><div class="tune-orb-core"></div></div>
+        <div class="tune-3d-wrap"><canvas class="tune-3d" id="tune3d" aria-hidden="true"></canvas></div>
         <div>
           <span class="eyebrow">Sous le capot</span>
           <h3 style="margin-top:14px;">Ce que Storm Tweaks ajuste</h3>
@@ -5411,6 +5431,197 @@ three/build/three.module.js:
 })();
 </script>
 <script>
+// ---- Storm Tweaks : nappe de plasma en fond de page (WebGL shader) ----
+(function initStormField(){
+ try{
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('stormField');
+  if(reduceMotion || !canvas || typeof THREE === 'undefined' || !window.WebGLRenderingContext) return;
+  if(window.innerWidth < 560) return;
+
+  let renderer;
+  try{ renderer = new THREE.WebGLRenderer({ canvas, antialias:false, alpha:false, powerPreference:'low-power' }); }
+  catch(e){ return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.4));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const material = new THREE.ShaderMaterial({
+    uniforms:{ uTime:{ value:0 }, uResolution:{ value:new THREE.Vector2(1,1) } },
+    vertexShader:`
+      void main(){ gl_Position = vec4(position.xy, 0.0, 1.0); }
+    `,
+    fragmentShader:`
+      precision highp float;
+      uniform float uTime;
+      uniform vec2 uResolution;
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453123); }
+      float vnoise(vec2 p){
+        vec2 i = floor(p); vec2 f = fract(p);
+        float a = hash(i), b = hash(i + vec2(1.0,0.0)), c = hash(i + vec2(0.0,1.0)), d = hash(i + vec2(1.0,1.0));
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(a,b,u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+      }
+      float fbm(vec2 p){
+        float v = 0.0; float amp = 0.5;
+        for(int i = 0; i < 5; i++){ v += amp * vnoise(p); p *= 2.02; amp *= 0.5; }
+        return v;
+      }
+      void main(){
+        vec2 uv = gl_FragCoord.xy / uResolution.xy;
+        vec2 p = uv * vec2(uResolution.x / uResolution.y, 1.0) * 2.4;
+        float t = uTime * 0.045;
+        float n1 = fbm(p + vec2(t, -t * 0.7));
+        float n2 = fbm(p * 1.6 - vec2(t * 0.5, t * 0.3) + 4.2);
+        vec3 cVoid = vec3(0.027,0.020,0.059);
+        vec3 cPurple = vec3(0.545,0.184,0.961);
+        vec3 cMagenta = vec3(1.0,0.180,0.651);
+        vec3 cCyan = vec3(0.133,0.890,1.0);
+        vec3 col = cVoid;
+        col = mix(col, cPurple, smoothstep(0.45,0.78,n1));
+        col = mix(col, cMagenta, smoothstep(0.68,0.95,n2));
+        col = mix(col, cCyan, smoothstep(0.72,1.0,n1) * 0.7);
+        float vig = smoothstep(1.15, 0.15, length(uv - 0.5));
+        col *= mix(0.2, 0.75, vig);
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `
+  });
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
+
+  function resize(){
+    const w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h, false);
+    material.uniforms.uResolution.value.set(w, h);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const clock = new THREE.Clock();
+  let rafId = null;
+  function animate(){
+    rafId = requestAnimationFrame(animate);
+    material.uniforms.uTime.value = clock.getElapsedTime();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden){ if(rafId) cancelAnimationFrame(rafId); rafId = null; }
+    else if(!rafId){ animate(); }
+  });
+ }catch(err){
+   console.error('[stormField]', err && err.stack || err);
+ }
+})();
+</script>
+<script>
+// ---- Storm Tweaks : illustration isométrique "sous le capot" ----
+(function initTune3D(){
+ try{
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('tune3d');
+  if(!canvas || typeof THREE === 'undefined' || !window.WebGLRenderingContext) return;
+
+  let renderer, started = false, rafId = null;
+  const scene = new THREE.Scene();
+  const frustum = 5.2;
+  const camera = new THREE.OrthographicCamera(-frustum, frustum, frustum, -frustum, 0.1, 50);
+  camera.position.set(6.2, 5.2, 6.2);
+  camera.lookAt(0, 0.3, 0);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(3.1, 3.1, 0.22, 6),
+    new THREE.MeshStandardMaterial({ color:0x150f2c, roughness:0.85, metalness:0.1 })
+  );
+  base.position.y = -0.5;
+  group.add(base);
+
+  const palette = [0x8b2ff5, 0x22e3ff, 0xff2ea6, 0xffc400, 0x8b2ff5, 0x22e3ff];
+  const heights = [1.4, 2.5, 1.9, 3.1, 1.6, 2.2];
+  const barGroup = new THREE.Group();
+  const count = heights.length;
+  const radius = 1.7;
+  const bars = [];
+  heights.forEach((h, i) => {
+    const angle = (i / count) * Math.PI * 2;
+    const mat = new THREE.MeshStandardMaterial({ color:palette[i % palette.length], roughness:0.35, metalness:0.25, emissive:palette[i % palette.length], emissiveIntensity:0.12 });
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.62, h, 0.62), mat);
+    bar.position.set(Math.cos(angle) * radius, h / 2 - 0.38, Math.sin(angle) * radius);
+    bar.userData.targetY = h / 2 - 0.38;
+    bar.userData.targetH = h;
+    bar.scale.y = 0.001;
+    bar.position.y = -0.38;
+    barGroup.add(bar);
+    bars.push(bar);
+  });
+  group.add(barGroup);
+
+  scene.add(new THREE.AmbientLight(0x8b7bc4, 0.7));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.9);
+  dir.position.set(4, 6, 3);
+  scene.add(dir);
+  const accent = new THREE.PointLight(0x22e3ff, 1.1, 12);
+  accent.position.set(-3, 3, -2);
+  scene.add(accent);
+
+  function resize(){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if(w === 0 || h === 0 || !renderer) return;
+    renderer.setSize(w, h, false);
+    const aspect = w / h;
+    camera.left = -frustum * aspect; camera.right = frustum * aspect;
+    camera.top = frustum; camera.bottom = -frustum;
+    camera.updateProjectionMatrix();
+  }
+
+  const clock = new THREE.Clock();
+  function animate(){
+    rafId = requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+    if(!reduceMotion){ group.rotation.y = t * 0.18; }
+    bars.forEach((bar, i) => {
+      const grown = Math.min(1, (t - i * 0.08) * 2.2);
+      if(grown > 0){
+        const ease = 1 - Math.pow(1 - Math.max(0, Math.min(1, grown)), 3);
+        bar.scale.y = Math.max(0.001, ease);
+        bar.position.y = bar.userData.targetY * ease + -0.38 * (1 - ease);
+      }
+    });
+    renderer.render(scene, camera);
+  }
+
+  function start(){
+    if(started) return;
+    started = true;
+    try{ renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true, powerPreference:'low-power' }); }
+    catch(e){ return; }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    resize();
+    window.addEventListener('resize', resize);
+    if(reduceMotion){ bars.forEach(b => { b.scale.y = 1; b.position.y = b.userData.targetY; }); renderer.render(scene, camera); }
+    else{ animate(); }
+  }
+  function stop(){
+    if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){ start(); if(!reduceMotion && !rafId) animate(); }
+      else{ stop(); }
+    });
+  }, { threshold:0.15 });
+  io.observe(canvas);
+ }catch(err){
+   console.error('[tune3D]', err && err.stack || err);
+ }
+})();
+</script>
+<script>
 (function(){
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(window.gsap && window.ScrollTrigger){ gsap.registerPlugin(ScrollTrigger); }
@@ -5452,7 +5663,7 @@ three/build/three.module.js:
   // ---- titre du héro : révélation au chargement ----
   const heroTitle = document.getElementById('heroTitle');
   if(heroTitle && window.gsap && !reduceMotion){
-    gsap.from(heroTitle, { opacity:0, y:36, duration:0.9, ease:'expo.out', delay:0.25 });
+    gsap.from(heroTitle.querySelectorAll('.line-inner'), { yPercent:112, duration:1, ease:'expo.out', stagger:0.12, delay:0.2 });
     gsap.from(heroTitle.nextElementSibling, { opacity:0, y:20, duration:0.8, ease:'expo.out', delay:0.5 });
   }
 
