@@ -160,6 +160,8 @@
   .logo{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:1.05rem; letter-spacing:0.01em;}
   .logo b{color:var(--gold); font-weight:700;}
   .logo-mark{
+    --logo-scale:1;
+    position:relative; overflow:hidden;
     width:34px; height:34px;
     display:grid; place-items:center;
     background:linear-gradient(150deg, var(--logo-1), var(--logo-2));
@@ -168,12 +170,22 @@
     animation:logo-pulse 3.2s ease-in-out infinite;
     transition:transform .3s var(--ease-out);
   }
-  header.is-scrolled .logo-mark{transform:scale(0.88);}
+  header.is-scrolled .logo-mark{--logo-scale:0.88;}
   @keyframes logo-pulse{
-    0%,100%{ box-shadow:0 4px 16px -4px #ff2ea666; transform:rotate(0deg); }
-    50%{ box-shadow:0 6px 22px -2px #22e3ff88; transform:rotate(-4deg); }
+    0%,100%{ box-shadow:0 4px 16px -4px #ff2ea666; transform:rotate(0deg) scale(var(--logo-scale,1)); }
+    50%{ box-shadow:0 6px 22px -2px #22e3ff88; transform:rotate(-4deg) scale(var(--logo-scale,1)); }
   }
-  .logo-mark svg{width:18px;height:18px;}
+  .logo-mark svg{width:18px;height:18px; position:relative; z-index:1;}
+  .logo-mark::after{
+    content:''; position:absolute; top:-60%; left:-70%; width:35%; height:220%;
+    background:linear-gradient(120deg, transparent, #ffffffc0, transparent);
+    transform:rotate(20deg) translateX(-130%);
+    animation:logo-glint 6s ease-in-out infinite;
+  }
+  @keyframes logo-glint{
+    0%, 82%{ transform:rotate(20deg) translateX(-130%); }
+    92%,100%{ transform:rotate(20deg) translateX(260%); }
+  }
   .nav-links{position:relative; display:flex; gap:32px; font-size:0.9rem; color:var(--muted);}
   .nav-links a{position:relative; padding-bottom:4px;}
   .nav-links a:hover{color:var(--text);}
@@ -260,6 +272,40 @@
   .scroll-cue svg{animation:scroll-bounce 1.8s ease-in-out infinite;}
   @keyframes scroll-bounce{0%,100%{transform:translateY(0);} 50%{transform:translateY(7px);}}
 
+  /* ---------- étoile filante (logo qui file) ---------- */
+  .hero-star{
+    position:absolute; z-index:2; width:18px; height:18px; opacity:0;
+    filter:drop-shadow(0 0 6px #fff3c2cc) drop-shadow(0 0 16px #22e3ffaa);
+    pointer-events:none;
+  }
+  .hero-star svg{width:100%; height:100%; display:block;}
+  .hero-star::before{
+    content:''; position:absolute; top:50%; left:50%; width:130px; height:2px;
+    background:linear-gradient(90deg, transparent, #ffffffb0 45%, #22e3ffcc 85%, transparent);
+    border-radius:2px;
+  }
+  .hero-star.star-1{ top:10%; left:6%; }
+  .hero-star.star-1::before{ transform:translateY(-50%) rotate(203deg); transform-origin:100% 50%; }
+  .hero-star.star-1{ animation:star-fly-1 9s ease-in infinite; animation-delay:1.4s; }
+  @keyframes star-fly-1{
+    0%{ opacity:0; transform:translate(0,0) scale(.3); }
+    4%{ opacity:1; transform:translate(6px,3px) scale(1); }
+    30%{ opacity:1; }
+    42%{ opacity:0; transform:translate(600px,250px) scale(.35); }
+    100%{ opacity:0; transform:translate(600px,250px) scale(.35); }
+  }
+  .hero-star.star-2{ top:4%; left:42%; }
+  .hero-star.star-2::before{ transform:translateY(-50%) rotate(197deg); transform-origin:100% 50%; }
+  .hero-star.star-2{ animation:star-fly-2 12s ease-in infinite; animation-delay:6s; }
+  @keyframes star-fly-2{
+    0%{ opacity:0; transform:translate(0,0) scale(.25); }
+    4%{ opacity:.9; transform:translate(5px,2px) scale(.8); }
+    26%{ opacity:.9; }
+    36%{ opacity:0; transform:translate(430px,140px) scale(.3); }
+    100%{ opacity:0; transform:translate(430px,140px) scale(.3); }
+  }
+  @media (max-width:680px){ .hero-star{display:none;} }
+
   .readout{
     background:linear-gradient(180deg, #150f2cd9, #100a26d9);
     backdrop-filter:blur(6px);
@@ -306,7 +352,7 @@
 
   /* ---------- bande de stats ---------- */
   .stats-band{padding:64px 0; position:relative; z-index:1;}
-  .stats-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+  .stats-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; max-width:760px; margin:0 auto;}
   .stat-card{
     background:linear-gradient(180deg, var(--panel), #100a26);
     border:1px solid var(--line); border-radius:16px; padding:26px 20px; text-align:center;
@@ -320,8 +366,7 @@
     display:inline-flex; align-items:baseline; gap:2px;
   }
   .stat-label{margin-top:8px; font-family:var(--font-mono); font-size:0.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted-2);}
-  @media (max-width:920px){.stats-grid{grid-template-columns:1fr 1fr;}}
-  @media (max-width:520px){.stats-grid{grid-template-columns:1fr;}}
+  @media (max-width:620px){.stats-grid{grid-template-columns:1fr;}}
 
   /* ---------- séparateur éclair animé ---------- */
   .section-divider{width:100%; max-width:1180px; margin:0 auto; padding:0 24px;}
@@ -628,6 +673,13 @@
       Scroll
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
+
+    <div class="hero-star star-1" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-2 8 10-13h-6l1-7Z" fill="#fff8e0"/></svg>
+    </div>
+    <div class="hero-star star-2" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-2 8 10-13h-6l1-7Z" fill="#fff8e0"/></svg>
+    </div>
   </section>
 
   <div class="marquee" aria-hidden="true">
@@ -642,7 +694,6 @@
     <div class="wrap">
       <div class="stats-grid">
         <div class="stat-card reveal"><div class="stat-num"><span class="count-up" data-target="150" data-suffix="+">0</span></div><div class="stat-label">Tweaks appliqués</div></div>
-        <div class="stat-card reveal"><div class="stat-num"><span class="count-up" data-target="1000" data-suffix="+">0</span></div><div class="stat-label">Membres Discord</div></div>
         <div class="stat-card reveal"><div class="stat-num"><span class="count-up" data-target="5" data-suffix=".0★">0</span></div><div class="stat-label">Avis moyen</div></div>
         <div class="stat-card reveal"><div class="stat-num"><span class="count-up" data-target="24" data-suffix="/7">0</span></div><div class="stat-label">Support communauté</div></div>
       </div>
